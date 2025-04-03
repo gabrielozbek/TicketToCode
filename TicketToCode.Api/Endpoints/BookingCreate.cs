@@ -1,34 +1,26 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using TicketToCode.Core.Data;
+﻿using TicketToCode.Core.Data;
 using TicketToCode.Core.Models;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Http;
+using TicketToCode.Api.Endpoints;
 
-namespace TicketToCode.Api.Endpoints.Booking;
+namespace TicketToCode.Api.Endpoints.BookingCreate;
 
-public static class Create
+public class BookingCreateEndpoint : IEndpoint
 {
-    public static IEndpointRouteBuilder MapBookingCreate(this IEndpointRouteBuilder endpoints)
+    public static void MapEndpoint(IEndpointRouteBuilder app)
     {
-        endpoints.MapPost("/api/bookings", async (
-            BookingRequest req,
-            Database db,
-            HttpContext context) =>
+        app.MapPost("/api/bookings", async (BookingRequest req, IDatabase db) =>
         {
-            
-            var userId = 1; 
-
             var booking = new Booking
             {
                 EventId = req.EventId,
-                UserId = userId
+                UserId = 1, // TODO: byt till riktig auth senare
             };
 
             db.Bookings.Add(booking);
-            await db.SaveChangesAsync();
             return Results.Ok(booking);
         });
-
-        return endpoints;
     }
 
     public record BookingRequest(int EventId);
