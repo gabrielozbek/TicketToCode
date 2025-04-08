@@ -12,12 +12,12 @@ builder.Services.AddRazorComponents()
 // Lägg till HttpClient för WebAssembly
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("https://localhost:7206/") // ← ändra om ditt API kör på annan port
+    BaseAddress = new Uri("https://localhost:7206/") // ← din API-url, korrekt!
 });
 
 var app = builder.Build();
 
-// Konfigurera pipeline
+// Felhantering och säkerhet
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
@@ -25,13 +25,17 @@ if (!app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseWebAssemblyDebugging(); // ← viktigt för WebAssembly
+    app.UseWebAssemblyDebugging();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseRouting();
 
+// 🧩 Viktig ordning börjar här
+app.UseRouting();
+app.UseAntiforgery(); // ✅ MÅSTE komma efter UseRouting, men före MapRazorComponents
+
+// Mappar till Blazor
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode();
