@@ -1,0 +1,47 @@
+﻿@page "/events"
+@inject HttpClient Http
+
+<h3>Kommande evenemang</h3>
+
+@if (events == null)
+{
+    <p>Laddar...</p>
+}
+else if (events.Count == 0)
+{
+    <p>Inga evenemang hittades.</p>
+}
+else
+{
+    <ul>
+        @foreach (var ev in events)
+        {
+            <li>
+                <strong>@ev.name</strong><br />
+                @ev.description<br />
+                @ev.start.ToString("g") – @ev.end.ToString("g")<br />
+                Max: @ev.maxAttendees<br /><br />
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    private List<EventResponse>? events;
+
+    protected override async Task OnInitializedAsync()
+    {
+        events = await Http.GetFromJsonAsync<List<EventResponse>>("/events");
+    }
+
+    public class EventResponse
+    {
+        public int id { get; set; }
+        public string name { get; set; }
+        public string description { get; set; }
+        public string eventType { get; set; }
+        public DateTime start { get; set; }
+        public DateTime end { get; set; }
+        public int maxAttendees { get; set; }
+    }
+}
