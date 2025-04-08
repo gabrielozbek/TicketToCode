@@ -19,8 +19,26 @@ public class Database : IDatabase
     {
         Events.AddRange(new List<Event>
         {
-            new Event { Id = 1, Title = "Konsert i Stockholm", Description = "Liveband", Location = "Stockholm", Date = DateTime.Now.AddDays(5) },
-            new Event { Id = 2, Title = "Konferens i Malmö", Description = "IT och framtid", Location = "Malmö", Date = DateTime.Now.AddDays(10) },
+            new Event
+            {
+                Id = 1,
+                Name = "Konsert i Stockholm",
+                Description = "Liveband på scen i centrala Stockholm",
+                EventType = "Concert",
+                StartTime = DateTime.Now.AddDays(5),
+                EndTime = DateTime.Now.AddDays(5).AddHours(2),
+                MaxAttendees = 100
+            },
+            new Event
+            {
+                Id = 2,
+                Name = "Konferens i Malmö",
+                Description = "Tech-konferens med gästföreläsare",
+                EventType = "Conference",
+                StartTime = DateTime.Now.AddDays(10),
+                EndTime = DateTime.Now.AddDays(10).AddHours(6),
+                MaxAttendees = 250
+            }
         });
     }
 }

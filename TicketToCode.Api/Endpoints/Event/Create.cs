@@ -1,4 +1,6 @@
 ﻿namespace TicketToCode.Api.Endpoints;
+using TicketToCode.Core.Models;
+
 public class CreateEvent : IEndpoint
 {
     // Mapping
@@ -12,7 +14,7 @@ public class CreateEvent : IEndpoint
     public record Request(
         string Name,
         string Description,
-        EventType Type,
+        string EventType,
         DateTime Start,
         DateTime End,
         int MaxAttendees
@@ -28,7 +30,7 @@ public class CreateEvent : IEndpoint
         // Map request to an event-object
         ev.Name = request.Name;
         ev.Description = request.Description;
-        ev.Type = request.Type;
+        ev.EventType = request.EventType;
         ev.StartTime = request.Start;
         ev.EndTime = request.End;
         ev.MaxAttendees = request.MaxAttendees;

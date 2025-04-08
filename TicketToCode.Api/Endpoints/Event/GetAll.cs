@@ -1,4 +1,6 @@
 ﻿namespace TicketToCode.Api.Endpoints;
+using TicketToCode.Core.Models;
+
 public class GetAllEvents : IEndpoint
 {
     // Mapping
@@ -11,7 +13,7 @@ public class GetAllEvents : IEndpoint
         int Id,
         string Name,
         string Description,
-        EventType Type,
+        string EventType,
         DateTime Start,
         DateTime End,
         int MaxAttendees
@@ -25,7 +27,7 @@ public class GetAllEvents : IEndpoint
                 Id: item.Id,
                 Name: item.Name,
                 Description: item.Description,
-                Type: item.Type,
+                EventType: item.EventType,
                 Start: item.StartTime,
                 End: item.EndTime,
                 MaxAttendees: item.MaxAttendees
