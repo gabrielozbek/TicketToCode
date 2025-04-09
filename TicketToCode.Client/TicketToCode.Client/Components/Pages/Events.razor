@@ -1,5 +1,6 @@
 ﻿@page "/events"
 @inject HttpClient Http
+@inject IJSRuntime JS
 
 <h3>Kommande evenemang</h3>
 
@@ -14,34 +15,50 @@ else if (events.Count == 0)
 else
 {
     <ul>
-        @foreach (var ev in events)
+        @foreach (var e in events)
         {
             <li>
-                <strong>@ev.name</strong><br />
-                @ev.description<br />
-                @ev.start.ToString("g") – @ev.end.ToString("g")<br />
-                Max: @ev.maxAttendees<br /><br />
+                <strong>@e.name</strong><br />
+                @e.description<br />
+                Typ: @e.eventType<br />
+                @e.startTime.ToString("g") – @e.endTime.ToString("g")<br />
+                Max: @e.maxAttendees<br />
+                <button @onclick="() => BookEvent(e.id)">Boka biljett</button>
             </li>
         }
     </ul>
 }
 
 @code {
-    private List<EventResponse>? events;
+    private List<Event>? events;
 
     protected override async Task OnInitializedAsync()
     {
-        events = await Http.GetFromJsonAsync<List<EventResponse>>("/events");
+        events = await Http.GetFromJsonAsync<List<Event>>("https://localhost:7206/api/events");
     }
 
-    public class EventResponse
+    async Task BookEvent(int eventId)
+    {
+        var response = await Http.PostAsJsonAsync("https://localhost:7206/api/bookings", new { EventId = eventId });
+
+        if (response.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Bokning lyckades!");
+        }
+        else
+        {
+            await JS.InvokeVoidAsync("alert", "Något gick fel!");
+        }
+    }
+
+    public class Event
     {
         public int id { get; set; }
         public string name { get; set; }
         public string description { get; set; }
         public string eventType { get; set; }
-        public DateTime start { get; set; }
-        public DateTime end { get; set; }
+        public DateTime startTime { get; set; }
+        public DateTime endTime { get; set; }
         public int maxAttendees { get; set; }
     }
 }
