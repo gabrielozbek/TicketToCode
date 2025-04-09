@@ -4,20 +4,18 @@ using TicketToCode.Client.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Lägg till services för både server och WebAssembly
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents()
-    .AddInteractiveWebAssemblyComponents();
 
-// Lägg till HttpClient för WebAssembly
+builder.Services.AddRazorComponents()
+    .AddInteractiveWebAssemblyComponents(); 
+
+
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("https://localhost:7206/") // ← din API-url, korrekt!
+    BaseAddress = new Uri("https://localhost:7206/") 
 });
 
 var app = builder.Build();
 
-// Felhantering och säkerhet
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
@@ -30,14 +28,11 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
-// 🧩 Viktig ordning börjar här
 app.UseRouting();
-app.UseAntiforgery(); // ✅ MÅSTE komma efter UseRouting, men före MapRazorComponents
+app.UseAntiforgery(); // viktigt!
 
-// Mappar till Blazor
+// Endast WebAssembly-rendering
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode()
-    .AddInteractiveWebAssemblyRenderMode();
+    .AddInteractiveWebAssemblyRenderMode(); 
 
 app.Run();

@@ -1,0 +1,86 @@
+﻿@page "/events"
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<h3>Kommande evenemang</h3>
+
+@if (events == null)
+
+{
+    <p>Laddar...</p>
+}
+
+else
+
+{
+    <ul>
+        @foreach (var e in events)
+
+        {
+            <li>
+                <strong>@e.Title</strong><br />
+                @e.Description<br />
+                @e.Location – @e.Date.ToShortDateString()<br />
+                <button @onclick="() => BookEvent(e.Id)">Boka biljett</button>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    List<Event> events;
+
+
+
+    protected override async Task OnInitializedAsync()
+
+    {
+
+        events = await Http.GetFromJsonAsync<List<Event>>("/api/events");
+
+    }
+
+
+
+    async Task BookEvent(int eventId)
+
+    {
+
+        var response = await Http.PostAsJsonAsync("/api/bookings", new { EventId = eventId });
+
+        if (response.IsSuccessStatusCode)
+
+        {
+
+            await JS.InvokeVoidAsync("alert", "Bokning lyckades!");
+
+        }
+
+        else
+
+        {
+
+            await JS.InvokeVoidAsync("alert", "Något gick fel!");
+
+        }
+
+    }
+
+
+
+    public class Event
+
+    {
+
+        public int Id { get; set; }
+
+        public string Title { get; set; }
+
+        public string Description { get; set; }
+
+        public string Location { get; set; }
+
+        public DateTime Date { get; set; }
+
+    }
+}
