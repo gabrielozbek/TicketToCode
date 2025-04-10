@@ -25,3 +25,5 @@ public class BookingCreateEndpoint : IEndpoint
 
     public record BookingRequest(int EventId);
 }
+
+

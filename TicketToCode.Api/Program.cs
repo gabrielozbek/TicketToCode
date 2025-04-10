@@ -4,6 +4,17 @@ using TicketToCode.Core.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowClient", policy =>
+    {
+        policy.WithOrigins("https://localhost:7232")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 // Default mapping is /openapi/v1.json
@@ -39,6 +50,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowClient");
 app.UseAuthentication();
 app.UseAuthorization();
 
