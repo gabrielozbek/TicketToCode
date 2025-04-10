@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Http;
 using TicketToCode.Api.Endpoints;
 
-namespace TicketToCode.Api.Endpoints.BookingCreate;
+namespace TicketToCode.Api.Endpoints;
 
-public class BookingCreateEndpoint : IEndpoint
+public class BookingCreate : IEndpoint
 {
     public static void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/bookings", async (BookingRequest req, Database db) =>
+        app.MapPost("/api/bookings", (BookingRequest req, Database db) =>
         {
             var booking = new Booking
             {
