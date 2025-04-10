@@ -1,16 +1,14 @@
 ﻿namespace TicketToCode.Api.Endpoints;
+
 using TicketToCode.Core.Models;
+using TicketToCode.Core.Data; // för att nå Database-klassen
 
 public class CreateEvent : IEndpoint
 {
-    // Mapping
     public static void MapEndpoint(IEndpointRouteBuilder app) => app
         .MapPost("/events", Handle)
         .WithSummary("Create event");
 
-    // Request and Response types
-    // Why do we need these? check this video if you are not sure
-    // https://youtu.be/xtpPspNdX58?si=GJBUxMzeR2ZJ5Fg_
     public record Request(
         string Name,
         string Description,
@@ -18,28 +16,28 @@ public class CreateEvent : IEndpoint
         DateTime Start,
         DateTime End,
         int MaxAttendees
-        );
-    public record Response(int id);
+    );
 
-    //Logic
-    private static Ok<Response> Handle(Request request, IDatabase db)
+    public record Response(int Id);
+
+    private static IResult Handle(Request request, Database db) // ✅ använder nu Database direkt
     {
-        // Todo, use a better constructor that enforces setting all necessary properties
-        var ev = new Event();
+        int newId = db.Events.Any() ? db.Events.Max(e => e.Id) + 1 : 1;
 
-        // Map request to an event-object
-        ev.Name = request.Name;
-        ev.Description = request.Description;
-        ev.EventType = request.EventType;
-        ev.StartTime = request.Start;
-        ev.EndTime = request.End;
-        ev.MaxAttendees = request.MaxAttendees;
+        var ev = new Event
+        {
+            Id = newId,
+            Name = request.Name,
+            Description = request.Description,
+            EventType = request.EventType,
+            StartTime = request.Start,
+            EndTime = request.End,
+            MaxAttendees = request.MaxAttendees
+        };
 
+        db.Events.Add(ev);
+        db.SaveChanges(); // funkar eftersom den är tom men finns i klassen
 
-        // Todo: does this set id on ev-object?
-        db.Events.Add(ev); 
-
-        return TypedResults.Ok(new Response(ev.Id));
+        return Results.Ok(new Response(ev.Id));
     }
 }
-

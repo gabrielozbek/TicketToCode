@@ -2,14 +2,7 @@
 
 namespace TicketToCode.Core.Data;
 
-public interface IDatabase
-{
-    List<Event> Events { get; set; }
-    List<User> Users { get; set; }
-    List<Booking> Bookings { get; set; }
-}
-
-public class Database : IDatabase
+public class Database
 {
     public List<Event> Events { get; set; } = new List<Event>();
     public List<User> Users { get; set; } = new List<User>();
@@ -40,5 +33,10 @@ public class Database : IDatabase
                 MaxAttendees = 250
             }
         });
+    }
+
+    public void SaveChanges()
+    {
+        // Eftersom detta är en in-memory-databas, behövs inget här
     }
 }

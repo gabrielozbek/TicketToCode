@@ -20,7 +20,7 @@ public class GetAllEvents : IEndpoint
     );
 
     //Logic
-    private static List<Response> Handle(IDatabase db)
+    private static List<Response> Handle(Database db)
     {
         return db.Events
             .Select(item => new Response(

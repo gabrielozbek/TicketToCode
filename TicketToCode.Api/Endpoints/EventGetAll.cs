@@ -10,7 +10,7 @@ public class EventGetAll : IEndpoint
 {
     public static void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/events", (IDatabase db) =>
+        app.MapGet("/api/events", (Database db) =>
         {
             return Results.Ok(db.Events);
         });

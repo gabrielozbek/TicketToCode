@@ -23,7 +23,7 @@ public class GetEvent : IEndpoint
 
 
     //Logic
-    private static Response Handle([AsParameters] Request request, IDatabase db)
+    private static Response Handle([AsParameters] Request request, Database db)
     {
         var ev = db.Events.Find(ev => ev.Id == request.Id);
 

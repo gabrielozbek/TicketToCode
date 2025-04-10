@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Default mapping is /openapi/v1.json
 builder.Services.AddOpenApi();
  
-builder.Services.AddSingleton<IDatabase, Database>();
+builder.Services.AddSingleton<Database, Database>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Add cookie authentication

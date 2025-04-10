@@ -10,7 +10,7 @@ public class BookingCreateEndpoint : IEndpoint
 {
     public static void MapEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/bookings", async (BookingRequest req, IDatabase db) =>
+        app.MapPost("/api/bookings", async (BookingRequest req, Database db) =>
         {
             var booking = new Booking
             {
