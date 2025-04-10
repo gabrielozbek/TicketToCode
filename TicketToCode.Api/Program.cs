@@ -18,12 +18,12 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 // Default mapping is /openapi/v1.json
+//  Add services
 builder.Services.AddOpenApi();
- 
 builder.Services.AddSingleton<Database, Database>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// Add cookie authentication
+//  Add cookie authentication
 builder.Services.AddAuthentication("Cookies")
     .AddCookie("Cookies", options =>
     {
@@ -34,23 +34,35 @@ builder.Services.AddAuthentication("Cookies")
 
 builder.Services.AddAuthorization();
 
+//  Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("https://localhost:7232") // Blazor-domänen
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+//  Development Swagger
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-
-    // Todo: consider scalar? https://youtu.be/Tx49o-5tkis?feature=shared
-    app.UseSwaggerUI( options =>
+    app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/openapi/v1.json", "v1");
         options.DefaultModelsExpandDepth(-1);
     });
 }
 
+// Middleware – viktig ordning!
 app.UseHttpsRedirection();
 app.UseCors("AllowClient");
+app.UseCors();              //  Måste vara före Auth
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -58,4 +70,3 @@ app.UseAuthorization();
 app.MapEndpoints<Program>();
 
 app.Run();
-
