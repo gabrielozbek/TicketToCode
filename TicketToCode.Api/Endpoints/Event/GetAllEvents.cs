@@ -3,12 +3,12 @@ using TicketToCode.Core.Models;
 
 public class GetAllEvents : IEndpoint
 {
-    // Mapping
+    // Mapping för GET-anrop
     public static void MapEndpoint(IEndpointRouteBuilder app) => app
         .MapGet("/events", Handle)
         .WithSummary("Get all events");
 
-    // Request and Response types
+    // Response-typ
     public record Response(
         int Id,
         string Name,
@@ -19,10 +19,10 @@ public class GetAllEvents : IEndpoint
         int MaxAttendees
     );
 
-    //Logic
-    private static List<Response> Handle(Database db)
+    // Logik för att hämta alla event
+    private static IResult Handle(Database db)
     {
-        return db.Events
+        var events = db.Events
             .Select(item => new Response(
                 Id: item.Id,
                 Name: item.Name,
@@ -32,5 +32,14 @@ public class GetAllEvents : IEndpoint
                 End: item.EndTime,
                 MaxAttendees: item.MaxAttendees
             )).ToList();
+
+        // Om inga events finns, returnera en tom lista med 200 OK
+        if (!events.Any())
+        {
+            return Results.Ok(new { Message = "No events found." });
+        }
+
+        // Returnera alla events med 200 OK
+        return Results.Ok(events);
     }
 }

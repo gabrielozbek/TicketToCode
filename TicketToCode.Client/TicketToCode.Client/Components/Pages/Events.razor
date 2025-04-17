@@ -4,63 +4,82 @@
 
 <h3>Kommande evenemang</h3>
 
-@if (events == null)
+@if (eventList == null)
 {
-    <p>Laddar...</p>
+    <p>Laddar evenemang...</p>
 }
-else if (events.Count == 0)
+else if (eventList.Count == 0)
 {
     <p>Inga evenemang hittades.</p>
 }
 else
 {
     <ul>
-        @foreach (var e in events)
+        @foreach (var eventItem in eventList)
         {
             <li>
-                <strong>@e.name</strong><br />
-                @e.description<br />
-                Typ: @e.eventType<br />
-                @e.startTime.ToString("g") – @e.endTime.ToString("g")<br />
-                Max: @e.maxAttendees<br />
-                <button @onclick="() => BookEvent(e.id)">Boka biljett</button>
+                <strong>@eventItem.Name</strong><br />
+                @eventItem.Description<br />
+                Typ: @eventItem.EventType<br />
+                @eventItem.StartTime.ToString("g") – @eventItem.EndTime.ToString("g")<br />
+                Max antal deltagare: @eventItem.MaxAttendees<br />
+                <button @onclick="() => BookTicket(eventItem.Id)">Boka biljett</button>
             </li>
         }
     </ul>
 }
 
 @code {
-    private List<Event>? events;
+    private List<EventDto>? eventList;
 
+    /// <summary>
+    /// Hämtar alla evenemang från API när komponenten laddas.
+    /// </summary>
     protected override async Task OnInitializedAsync()
     {
-        events = await Http.GetFromJsonAsync<List<Event>>("https://localhost:7206/api/events");
+        eventList = await Http.GetFromJsonAsync<List<EventDto>>("https://localhost:7206/api/events");
     }
 
-    async Task BookEvent(int eventId)
+    /// <summary>
+    /// Skickar en bokningsförfrågan till backend för det valda evenemanget.
+    /// </summary>
+    /// <param name="eventId">ID för det evenemang som användaren vill boka.</param>
+    private async Task BookTicket(int eventId)
     {
-        Console.WriteLine("Knappen klickades!"); // debug
+        Console.WriteLine($"Boka-knappen klickades för Event ID: {eventId}");
 
-        var response = await Http.PostAsJsonAsync("https://localhost:7206/api/bookings", new { EventId = eventId });
+        // Tillfällig användar-ID tills riktig autentisering finns
+        var bookingRequest = new
+        {
+            EventId = eventId,
+            UserId = 1
+        };
+
+        // Skickar POST-förfrågan till backend
+        var response = await Http.PostAsJsonAsync("https://localhost:7206/api/bookings", bookingRequest);
 
         if (response.IsSuccessStatusCode)
         {
-            await JS.InvokeVoidAsync("alert", "Bokning lyckades!");
+            await JS.InvokeVoidAsync("alert", "Bokningen lyckades!");
         }
         else
         {
-            await JS.InvokeVoidAsync("alert", "Något gick fel!");
+            var errorMessage = await response.Content.ReadAsStringAsync();
+            await JS.InvokeVoidAsync("alert", $"Bokningen misslyckades:\n{errorMessage}");
         }
     }
 
-    public class Event
+    /// <summary>
+    /// DTO-modell för att representera ett evenemang från backend.
+    /// </summary>
+    public class EventDto
     {
-        public int id { get; set; }
-        public string name { get; set; } = "";
-        public string description { get; set; } = "";
-        public string eventType { get; set; } = "";
-        public DateTime startTime { get; set; }
-        public DateTime endTime { get; set; }
-        public int maxAttendees { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string EventType { get; set; } = string.Empty;
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public int MaxAttendees { get; set; }
     }
 }
