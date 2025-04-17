@@ -1,59 +1,41 @@
 ﻿@page "/login"
+@inject NavigationManager Nav
 @inject HttpClient Http
-@inject NavigationManager Navigation
 
 <h3>Logga in</h3>
 
-<EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<input @bind="username" placeholder="Användarnamn" />
+<input @bind="password" type="password" placeholder="Lösenord" />
+<button @onclick="HandleLogin">Logga in</button>
 
-    <div class="form-group">
-        <label for="username">Användarnamn</label>
-        <InputText id="username" class="form-control" Value="@loginModel.Username" @onchange="e => loginModel.Username = e.Value.ToString()" />
-    </div>
-
-    <div class="form-group">
-        <label for="password">Lösenord</label>
-        <InputText id="password" class="form-control" type="password" Value="@loginModel.Password" @onchange="e => loginModel.Password = e.Value.ToString()" />
-    </div>
-
-    <div class="form-group mt-3">
-        <button type="submit" class="btn btn-primary">Logga in</button>
-    </div>
-</EditForm>
-
-@if (errorMessage != null)
+@if (!string.IsNullOrEmpty(errorMessage))
 {
-    <div class="alert alert-danger mt-3">
-        @errorMessage
-    </div>
+    <p style="color:red">@errorMessage</p>
 }
 
 @code {
-    private LoginModel loginModel = new LoginModel();
+    private string username = "";
+    private string password = "";
     private string? errorMessage;
 
     private async Task HandleLogin()
     {
-        // Skicka inloggningsförfrågan till backend
-        var response = await Http.PostAsJsonAsync("/auth/login", loginModel);
+        var response = await Http.PostAsJsonAsync("/auth/login", new { Username = username, Password = password });
 
         if (response.IsSuccessStatusCode)
         {
-            // Om inloggningen lyckas, navigera till events-sidan
-            Navigation.NavigateTo("/events");
+            var user = await response.Content.ReadFromJsonAsync<LoginResponse>();
+            Nav.NavigateTo("/event");  // Redirect to event page after successful login
         }
         else
         {
-            // Om det blir ett fel, visa felmeddelande
-            errorMessage = "Ogiltigt användarnamn eller lösenord!";
+            errorMessage = "Fel användarnamn eller lösenord.";
         }
     }
 
-    public class LoginModel
+    public class LoginResponse
     {
-        public string Username { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
+        public string Username { get; set; }
+        public string Role { get; set; }
     }
 }

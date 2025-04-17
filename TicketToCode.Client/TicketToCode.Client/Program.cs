@@ -8,10 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
 
-// Registrera HttpClient för API-anrop
-builder.Services.AddScoped(sp => new HttpClient
+// Registrera HttpClient med cookies aktiverade
+builder.Services.AddScoped(sp => new HttpClient(new HttpClientHandler
 {
-    BaseAddress = new Uri("https://localhost:7206/")
+    UseCookies = true // Aktivera cookies för autentisering
+})
+{
+    BaseAddress = new Uri("https://localhost:7206/") // Din API-adress
 });
 
 var app = builder.Build();
@@ -23,15 +26,15 @@ if (!app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseWebAssemblyDebugging(); // För interaktivitet via WebAssembly
+    app.UseWebAssemblyDebugging();
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseAntiforgery(); // viktigt!
+app.UseAntiforgery(); // Viktigt för säkerheten
 
-// Aktivera komponentrendering
 app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode();
 
