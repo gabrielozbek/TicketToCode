@@ -1,7 +1,6 @@
 ﻿namespace TicketToCode.Api.Endpoints;
-
 using TicketToCode.Core.Models;
-using TicketToCode.Core.Data; // för att nå Database-klassen
+using TicketToCode.Core.Data;
 
 public class CreateEvent : IEndpoint
 {
@@ -22,6 +21,7 @@ public class CreateEvent : IEndpoint
 
     private static IResult Handle(Request request, Database db) // ✅ använder nu Database direkt
     {
+        // Här säkerställer vi att nya event får ett unikt ID
         int newId = db.Events.Any() ? db.Events.Max(e => e.Id) + 1 : 1;
 
         var ev = new Event
@@ -36,8 +36,8 @@ public class CreateEvent : IEndpoint
         };
 
         db.Events.Add(ev);
-        db.SaveChanges(); // funkar eftersom den är tom men finns i klassen
+        db.SaveChanges(); // Lägg till eventet i databasen
 
-        return Results.Ok(new Response(ev.Id));
+        return Results.Ok(new Response(ev.Id)); // Returnera det skapade eventets ID
     }
 }
