@@ -1,0 +1,36 @@
+﻿@page "/register"
+@inject NavigationManager Nav
+@inject HttpClient Http
+
+<h3>Registrera dig</h3>
+
+<input @bind="username" placeholder="Användarnamn" />
+<input @bind="password" type="password" placeholder="Lösenord" />
+<button @onclick="HandleRegister">Registrera</button>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <p>@message</p>
+}
+
+@code {
+    private string username = "";
+    private string password = "";
+    private string? message;
+
+    private async Task HandleRegister()
+    {
+        var response = await Http.PostAsJsonAsync("/auth/register", new { Username = username, Password = password });
+
+        if (response.IsSuccessStatusCode)
+        {
+            message = "Registrering lyckades! Du skickas vidare till inloggning...";
+            await Task.Delay(1500);
+            Nav.NavigateTo("/login");
+        }
+        else
+        {
+            message = "Registrering misslyckades. Användarnamnet kan redan vara taget.";
+        }
+    }
+}

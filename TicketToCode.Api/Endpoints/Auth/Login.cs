@@ -7,14 +7,14 @@ public class Login : IEndpoint
     // Mapping
     public static void MapEndpoint(IEndpointRouteBuilder app) => app
         .MapPost("/auth/login", Handle)
-        .WithSummary("Login with username and password")
+        .WithSummary("Logga in med användarnamn och lösenord")
         .AllowAnonymous();
 
-    // Models
+    // Datamodeller för begäran och svar
     public record Request(string Username, string Password);
     public record Response(string Username, string Role);
 
-    // Logic
+    // Huvudlogiken för inloggning
     private static Results<Ok<Response>, NotFound<string>> Handle(
         Request request,
         IAuthService authService,
@@ -23,17 +23,17 @@ public class Login : IEndpoint
         var result = authService.Login(request.Username, request.Password);
         if (result == null)
         {
-            return TypedResults.NotFound("Invalid username or password");
+            return TypedResults.NotFound("Ogiltigt användarnamn eller lösenord");
         }
 
-        // Set a simple auth cookie
+        //  Skapa en enkel autentiseringscookie
         context.Response.Cookies.Append("auth", $"{result.Username}:{result.Role}", new CookieOptions
         {
             HttpOnly = true,
             SameSite = SameSiteMode.Strict,
             Expires = DateTimeOffset.UtcNow.AddDays(7)
         });
-        var response = new Response(result.Username, result.Role);
-        return TypedResults.Ok(response);
+        var response = new Response(result.Username, result.Role); //skapa svar
+        return TypedResults.Ok(response); // skicka tillbaka svaret
     }
 }
