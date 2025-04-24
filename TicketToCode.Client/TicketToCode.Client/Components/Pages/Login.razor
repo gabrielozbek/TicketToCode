@@ -1,16 +1,16 @@
-﻿@page "/login"
-@inject NavigationManager Nav
-@inject HttpClient Http
+﻿@page "/login" // Anger att denna komponent är tillgänglig via URL:en /login
+@inject NavigationManager Nav // Används för att navigera mellan sidor
+@inject HttpClient Http // Används för att göra HTTP-anrop till API:t
 
 <h3>Logga in</h3>
 
+<!-- Inmatningsfält för användarnamn och lösenord -->
 <input @bind="username" placeholder="Användarnamn" />
 <input @bind="password" type="password" placeholder="Lösenord" />
-<button @onclick="HandleLogin">Logga in</button>
-
+<button @onclick="HandleLogin">Logga in</button> <!-- Klick på knappen anropar HandleLogin -->
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-    <p style="color:red">@errorMessage</p>
+    <p style="color:red">@errorMessage</p> <!-- Visar felmeddelande om något går fel -->
 }
 
 @code {
@@ -18,21 +18,26 @@
     private string password = "";
     private string? errorMessage;
 
+    // Metod som hanterar inloggningsförsöket
     private async Task HandleLogin()
     {
+        // Skickar POST-anrop med användarnamn och lösenord till API:t
         var response = await Http.PostAsJsonAsync("/auth/login", new { Username = username, Password = password });
 
         if (response.IsSuccessStatusCode)
         {
+            // Om inloggning lyckas, läs svaret och navigera till event-sidan
             var user = await response.Content.ReadFromJsonAsync<LoginResponse>();
-            Nav.NavigateTo("/event");  // Redirect to event page after successful login
+            Nav.NavigateTo("/event");
         }
         else
         {
+            // Visar felmeddelande om inloggningen misslyckas
             errorMessage = "Fel användarnamn eller lösenord.";
         }
     }
 
+    // Klass som representerar svaret från inloggnings-API:t
     public class LoginResponse
     {
         public string Username { get; set; }
